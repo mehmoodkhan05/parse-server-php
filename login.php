@@ -23,19 +23,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $user = $query->first();
 
         if ($user) {
-            // Verify the password against the hashed password stored in Parse
-            $_SESSION['email'] = $email;
-            $_SESSION['name'] = $user->get('name');
-            $_SESSION['phone'] = $user->get('phone');
-            $_SESSION['dob'] = $user->get('dob');
-            $_SESSION['gender'] = $user->get('gender');
-            $_SESSION['password'] = $user->get('passwprd');
-            $_SESSION['fileUpload'] = $user->get('fileUpload');
-            $_SESSION['objectId'] = $user->getObjectId();
+            // Get the password stored in Parse for the user
+            $storedPassword = $user->get('password');
 
-            // Redirect to home page after successful login
-            header("Location: home.php");
-            exit();
+            // Check if the provided password matches the stored password
+            if ($password === $storedPassword) {
+                // Start session and store necessary user data
+                session_start();
+                $_SESSION['email'] = $email;
+                $_SESSION['name'] = $user->get('name');
+                $_SESSION['phone'] = $user->get('phone');
+                $_SESSION['dob'] = $user->get('dob');
+                $_SESSION['gender'] = $user->get('gender');
+                $_SESSION['fileUpload'] = $user->get('fileUpload');
+                $_SESSION['objectId'] = $user->getObjectId();
+
+                // Redirect to home page after successful login
+                header("Location: home.php");
+                exit();
+            } else {
+                $validLogin = "<div class='alert alert-danger text-center'>Incorrect email or password!</div>";
+            }
         } else {
             $validLogin = "<div class='alert alert-danger text-center'>User not found!</div>";
         }
